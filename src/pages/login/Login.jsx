@@ -1,8 +1,47 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import './Login.css'
+import './Login.css';
+import { getAuth,signInWithEmailAndPassword} from "firebase/auth";
+import app from '../../firebase/Config';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 const Login = () => {
+	const auth = getAuth(app);
+	const navigate = useNavigate();
+	const [user, setUser] = useState({
+		email:'',
+		password:''
+	});
+
+	const handleChange = (e)=>{
+      const name = e.target.name;
+	  const value = e.target.value;
+
+	  setUser(prevState=>({
+		...prevState,
+		[name]:value
+	  }))
+	}
+
+	const handleSubmit = (e)=>{
+   e.preventDefault();
+   signInWithEmailAndPassword(auth, user.email, user.password)
+   .then((userCredential) => {
+	 // Signed in 
+	 const user = userCredential.user;
+	 console.log(user)
+	 toast.success('Logged in successfully')
+	 navigate('/home');
+   })
+   .catch((error) => {
+	 const errorCode = error.code;
+	 const errorMessage = error.message;
+	 console.log(errorMessage)
+	 toast.error(error.message)
+   });
+	}
   return (
+	<>
     <section className="ftco-section">
 		<div className="container">
 			<div className="row justify-content-center">
@@ -32,14 +71,14 @@ const Login = () => {
 									</p>
 								</div>
 			      	</div>
-							<form action="#" className="signin-form">
+							<form  className="signin-form" onSubmit={handleSubmit}>
 			      		<div className="form-group mb-3">
-			      			<label className="label" for="name">Username</label>
-			      			<input type="text" className="form-control" placeholder="Username" required/>
+			      			<label className="label" for="name">Email</label>
+			      			<input type="text" className="form-control" placeholder="email" onChange={handleChange} required name='email'/>
 			      		</div>
 		            <div className="form-group mb-3">
 		            	<label className="label" for="password">Password</label>
-		              <input type="password" className="form-control" placeholder="Password" required/>
+		              <input type="password" className="form-control" placeholder="Password" onChange={handleChange} required name='password'/>
 		            </div>
 		            <div className="form-group">
 		            	<button type="submit" className="form-control btn btn-primary submit px-3">Sign In</button>
@@ -62,7 +101,7 @@ const Login = () => {
 			</div>
 		</div>
 	</section>
-
+	</>
   )
 }
 
