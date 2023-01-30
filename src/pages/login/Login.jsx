@@ -5,9 +5,11 @@ import { getAuth,signInWithEmailAndPassword} from "firebase/auth";
 import app from '../../firebase/Config';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Loader } from '../../components';
 const Login = () => {
 	const auth = getAuth(app);
 	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false)
 	const [user, setUser] = useState({
 		email:'',
 		password:''
@@ -25,9 +27,11 @@ const Login = () => {
 
 	const handleSubmit = (e)=>{
    e.preventDefault();
+   setIsLoading(true)
    signInWithEmailAndPassword(auth, user.email, user.password)
    .then((userCredential) => {
 	 // Signed in 
+	 setIsLoading(false)
 	 const user = userCredential.user;
 	 console.log(user)
 	 toast.success('Logged in successfully')
@@ -38,11 +42,14 @@ const Login = () => {
 	 const errorMessage = error.message;
 	 console.log(errorMessage)
 	 toast.error(error.message)
+	 setIsLoading(false)
    });
 	}
+	console.log(isLoading)
   return (
 	<>
-    <section className="ftco-section">
+	{isLoading && <Loader/>}
+    <section className={isLoading?'ftco-section blur':'ftco-section'}>
 		<div className="container">
 			<div className="row justify-content-center">
 				<div className="col-md-6 text-center mb-5">

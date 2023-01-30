@@ -1,0 +1,10 @@
+.loading{
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    z-index: 1000;
+  }
+  .blur
+  {
+   opacity: 0.5;
+  }
