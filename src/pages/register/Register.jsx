@@ -1,12 +1,14 @@
-import { getAuth, createUserWithEmailAndPassword  } from 'firebase/auth';
+import {createUserWithEmailAndPassword  } from 'firebase/auth';
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import '../login/Login.css'
-import app from '../../firebase/Config';
-import { toast,ToastContainer } from 'react-toastify';
+import {auth} from '../../firebase/Config';
+import { toast } from 'react-toastify';
+import { Loader } from '../../components';
+
 const Register = () => {
-	const auth = getAuth(app);
 	const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false)
 	const [user, setUser] =useState({
 		email: '',
 		password: ''
@@ -23,10 +25,12 @@ const Register = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		setIsLoading(true)
 		console.log(user.email)
 		createUserWithEmailAndPassword (auth, user.email, user.password)
 			.then((userCredential) => {
 				// Signed in 
+				setIsLoading(false)
 				const user = userCredential.user;
 				console.log(user)
 				toast.success('User Registered successfully')
@@ -36,12 +40,13 @@ const Register = () => {
 			.catch((error) => {
 				const errorCode = error.code;
 				const errorMessage = error.message;
-				
+				setIsLoading(false)
 				toast.error(errorMessage)
 			});
 	}
 	return (
 		<>
+		{isLoading && <Loader/>}
 		<section className="ftco-section">
 			<div className="container">
 				<div className="row justify-content-center">

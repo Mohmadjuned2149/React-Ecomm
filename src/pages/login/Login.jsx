@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Login.css';
-import { getAuth,signInWithEmailAndPassword} from "firebase/auth";
-import app from '../../firebase/Config';
+import {signInWithEmailAndPassword,signInWithPopup} from "firebase/auth";
+import {auth,provider} from '../../firebase/Config';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Loader } from '../../components';
 const Login = () => {
-	const auth = getAuth(app);
+	
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false)
 	const [user, setUser] = useState({
@@ -40,12 +40,34 @@ const Login = () => {
    .catch((error) => {
 	 const errorCode = error.code;
 	 const errorMessage = error.message;
-	 console.log(errorMessage)
 	 toast.error(error.message)
 	 setIsLoading(false)
    });
 	}
-	console.log(isLoading)
+
+	const signInWithGoogle = ()=>{
+		signInWithPopup(auth, provider)
+		.then((result) => {
+		  // This gives you a Google Access Token. You can use it to access the Google API.
+		  const credential = provider.credentialFromResult(result);
+		  const token = credential.accessToken;
+		  // The signed-in user info.
+		  const user = result.user;
+		  toast.success('Logged in successfully')
+		  navigate('/home');
+		  // ...
+		}).catch((error) => {
+		  // Handle Errors here.
+		  const errorCode = error.code;
+		  const errorMessage = error.message;
+		  // The email of the user's account used.
+		  const email = error.customData.email;
+		  // The AuthCredential type that was used.
+		  const credential = provider.credentialFromError(error);
+		  toast.error(errorMessage)
+		  // ...
+		});
+	}
   return (
 	<>
 	{isLoading && <Loader/>}
@@ -73,7 +95,7 @@ const Login = () => {
 			      		</div>
 								<div className="w-100">
 									<p className="social-media d-flex justify-content-end">
-										<Link to="/" className="social-icon d-flex align-items-center justify-content-center lk"><span className="fa fa-facebook"></span></Link>
+										<div  className="social-icon d-flex align-items-center justify-content-center lk"><span className="fa fa-google" onClick={signInWithGoogle}></span></div>
 										<a to="/" className="social-icon d-flex align-items-center justify-content-center lk"><span className="fa fa-twitter"></span></a>
 									</p>
 								</div>

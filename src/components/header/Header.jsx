@@ -1,8 +1,28 @@
-import React from 'react'
+import { signOut } from 'firebase/auth';
+import React, { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { auth } from '../../firebase/Config';
+import Loader from '../loader/Loader';
 import  './Head.css'
 const Header = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const loggedOut =() => {
+        setIsLoading(true);
+        signOut(auth).then(() => {
+            toast.success('Logged Out Successful');
+            setIsLoading(false);
+            // Sign-out successful.
+          }).catch((error) => {
+            toast.error(error);
+            setIsLoading(false);
+            // An error happened.
+          });
+          
+    }
     return (
+        <>
+        {isLoading && <Loader/>}
         <header >
             <nav className='navbar navbar-expand-lg text-light nv'>
                 <div className='container-fluid'>
@@ -17,7 +37,7 @@ const Header = () => {
                             </li>
                             <div className='collapse navbar-collapse subnav'>
                             <li className='nav-item mx-5'>
-                            <Link to='/' className='naitem'>Logout</Link>
+                            <Link to='/' className='naitem' onClick={loggedOut}>Logout</Link>
                             </li >
                             <li className='nav-item mx-5'>
                             <Link to='/' className='naitem'>Login</Link>
@@ -32,6 +52,7 @@ const Header = () => {
             </nav>
 
         </header>
+        </>
     )
 }
 
